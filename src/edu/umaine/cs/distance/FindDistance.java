@@ -31,7 +31,7 @@ public class FindDistance {
 	static Map<String, Route> cachedInfo;
 
 	/**
-	 * Usage: java edu.umaine.cs.FindDistance input_file.csv 'City, State Abbreviation'
+	 * Usage: java edu.umaine.cs.distance.FindDistance input_file.csv 'City, State Abbreviation'
 	 * 
 	 * For example,
 	 * 
