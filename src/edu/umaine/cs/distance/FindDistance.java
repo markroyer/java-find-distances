@@ -187,7 +187,7 @@ public class FindDistance {
 			String state = scan.nextLine().substring(1); // Remove leading comma
 			
 			Row r = new Row(id, d1, d2, plate, year, city, state);
-			System.out.println(r);
+
 			result.add(r);
 		}
 
