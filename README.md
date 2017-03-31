@@ -10,7 +10,7 @@ Usage: java edu.umaine.cs.FindDistance input_file.csv 'City, State Abbreviation'
  
 For example,
  
-java edu.umaine.cs.distance.FindDistance exampleInput.csv 'Orono, ME'
+java edu.umaine.cs.distance.FindDistance exampleInput.csv "Orono, ME"
 ```
 
 The input file must be a comma separated file with the following elements:

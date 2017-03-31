@@ -48,7 +48,7 @@ public class FindDistance {
 			System.err.println();
 			System.err.println("For example,");
 			System.err.println();
-			System.err.println("java edu.umaine.cs.FindDistance exampleInput.csv 'Orono, ME'");
+			System.err.println("java edu.umaine.cs.FindDistance exampleInput.csv \"Orono, ME\"");
 			System.exit(-1);
 		}
 		
