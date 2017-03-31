@@ -91,6 +91,7 @@ public class FindDistance {
 				Thread.sleep(40); // Slow and steady...
 			}
 			writeRow(out, row, r);
+			writeRow(System.out, row, r);
 
 		}
 
@@ -183,9 +184,11 @@ public class FindDistance {
 			String plate = scan.next();
 			String year = scan.next();
 			String city = scan.next();
-			String state = scan.nextLine();
+			String state = scan.nextLine().substring(1); // Remove leading comma
 			
-			result.add(new Row(id, d1, d2, plate, year, city, state));
+			Row r = new Row(id, d1, d2, plate, year, city, state);
+			System.out.println(r);
+			result.add(r);
 		}
 
 		scan.close();
