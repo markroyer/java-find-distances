@@ -31,7 +31,7 @@ public class Ajax {
 	public static Route getRoute(String origin, String destination,
 			String googleAPIKey) throws IOException {
 		// build a URL
-		String s = "http://maps.googleapis.com/maps/api/distancematrix/json?";
+		String s = "https://maps.googleapis.com/maps/api/distancematrix/json?";
 		s += "key=";
 		s += googleAPIKey;
 		s += "&origins=";
