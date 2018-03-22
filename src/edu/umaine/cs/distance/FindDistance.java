@@ -21,7 +21,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 /**
- * Find the distances of vehicle locations in a CSV file to a single location on the map.  This program makes use of the Google Maps API, so it requires a network connection to run properly.
+ * Find the distances of vehicle locations in a CSV file to a single location on
+ * the map. This program makes use of the Google Maps API, so it requires a
+ * network connection to run properly.
  * 
  * @author Mark Royer
  *
@@ -31,7 +33,8 @@ public class FindDistance {
 	static Map<String, Route> cachedInfo;
 
 	/**
-	 * Usage: java edu.umaine.cs.distance.FindDistance input_file.csv 'City, State Abbreviation'
+	 * Usage: java edu.umaine.cs.distance.FindDistance input_file.csv 'City,
+	 * State Abbreviation'
 	 * 
 	 * For example,
 	 * 
@@ -43,17 +46,19 @@ public class FindDistance {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		if (args.length < 2) {
-			System.err.println("Usage: java edu.umaine.cs.FindDistance input_file.csv 'City, State Abbreviation'");
+		if (args.length < 3) {
+			System.err.println("Usage: java edu.umaine.cs.FindDistance input_file.csv 'City, State Abbreviation' YOUR_API_KEY");
 			System.err.println();
 			System.err.println("For example,");
 			System.err.println();
 			System.err.println("java edu.umaine.cs.FindDistance exampleInput.csv \"Orono, ME\"");
 			System.exit(-1);
 		}
-		
-		String fileInputName = args[0];
-		File outputFile = new File(fileInputName.replace(".csv", "Out.csv"));
+
+		final String INPUT_FILE_NAME = args[0];
+		final String CITY_STATE = args[1];
+		final String API_KEY = args[2];
+		File outputFile = new File(INPUT_FILE_NAME.replace(".csv", "Out.csv"));
 		File cachedFile = new File("cachedLocations.json");
 
 		Gson gson = new Gson();
@@ -64,11 +69,12 @@ public class FindDistance {
 
 			BufferedReader br = new BufferedReader(new FileReader(cachedFile));
 
-			Type mapType = new TypeToken<Map<String, Route>>() { }.getType();
-			
+			Type mapType = new TypeToken<Map<String, Route>>() {
+			}.getType();
+
 			// convert the JSON string back into an object
 			cachedInfo = gson.fromJson(br, mapType);
-			
+
 		} else {
 
 			System.out.printf("Cached locations file was not found.  Creating new file and saving at '%s'.\n",
@@ -77,33 +83,40 @@ public class FindDistance {
 			cachedInfo = new HashMap<>();
 		}
 
-		List<Row> staff = readCSVFile(fileInputName);
+		List<Row> staff = readCSVFile(INPUT_FILE_NAME);
 
 		PrintStream out = new PrintStream(outputFile);
 
 		writeHeader(out);
-		for (Row row : staff) {
 
-			Route r = cachedInfo.get(row.city.toLowerCase());
-			if (r == null) {
-				r = Ajax.getRoute(row.city.toLowerCase() + "," + row.state, args[1]);
-				cachedInfo.put(row.city.toLowerCase(), r);
-				Thread.sleep(40); // Slow and steady...
+		try {
+
+			for (Row row : staff) {
+
+				Route r = cachedInfo.get(row.city.toLowerCase());
+				if (r == null) {
+					r = Ajax.getRoute(row.city.toLowerCase() + "," + row.state, CITY_STATE, API_KEY);
+					cachedInfo.put(row.city.toLowerCase(), r);
+					Thread.sleep(80); // Slow and steady...
+				}
+				writeRow(out, row, r);
+				writeRow(System.out, row, r);
+
 			}
-			writeRow(out, row, r);
-			writeRow(System.out, row, r);
+
+			out.flush();
+			out.close();
+
+		} finally { // Write out whatever we have to the cache no matter what
+
+			FileWriter cacheOut = new FileWriter(cachedFile);
+
+			cacheOut.write(gson.toJson(cachedInfo));
+
+			cacheOut.flush();
+			cacheOut.close();
 
 		}
-
-		out.flush();
-		out.close();
-
-		FileWriter cacheOut = new FileWriter(cachedFile);
-
-		cacheOut.write(gson.toJson(cachedInfo));
-
-		cacheOut.flush();
-		cacheOut.close();
 
 		System.out.printf("Finished finding distances for %d locations.  Output is in the file at '%s'.\n",
 				staff.size(), outputFile.getAbsolutePath());
@@ -185,7 +198,7 @@ public class FindDistance {
 			String year = scan.next();
 			String city = scan.next();
 			String state = scan.nextLine().substring(1); // Remove leading comma
-			
+
 			Row r = new Row(id, d1, d2, plate, year, city, state);
 
 			result.add(r);

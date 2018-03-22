@@ -21,14 +21,20 @@ public class Ajax {
 
 	public static void main(String[] args) throws IOException {
 
-		System.out.println(getRoute("Boston, MA", "New York, NY"));
-		System.out.println(getRoute("Portland, OR", "Detroit, MI"));
-		System.out.println(getRoute("Portland, ME", "Orono, ME"));
+		String apiKey = args[0];
+
+		System.out.println(getRoute("Boston, MA", "New York, NY", apiKey));
+		System.out.println(getRoute("Portland, OR", "Detroit, MI", apiKey));
+		System.out.println(getRoute("Portland, ME", "Orono, ME", apiKey));
 	}
 
-	public static Route getRoute(String origin, String destination) throws IOException {
+	public static Route getRoute(String origin, String destination,
+			String googleAPIKey) throws IOException {
 		// build a URL
-		String s = "http://maps.googleapis.com/maps/api/distancematrix/json?origins=";
+		String s = "http://maps.googleapis.com/maps/api/distancematrix/json?";
+		s += "key=";
+		s += googleAPIKey;
+		s += "&origins=";
 		s += encodeURLParameter(origin);
 		s += "&destinations=";
 		s += encodeURLParameter(destination);
@@ -72,28 +78,33 @@ public class Ajax {
 		//			}
 		//@formatter:on
 
-
 		String status = obj.get("status").getAsString();
-		
+
 		if (!status.equals("OK")) {
-			System.err.println("Not OK " + origin);
-			return new Route(origin, destination, 0,0, status);
+			System.err.println(
+					status + ": " + obj.get("error_message").getAsString());
+			return new Route(origin, destination, 0, 0, status);
 		}
-		
-		String orig = obj.getAsJsonArray("origin_addresses").get(0).getAsString();
-		String dest = obj.getAsJsonArray("destination_addresses").get(0).getAsString();
+
+		String orig = obj.getAsJsonArray("origin_addresses").get(0)
+				.getAsString();
+		String dest = obj.getAsJsonArray("destination_addresses").get(0)
+				.getAsString();
 		long distance = 0;
 		long duration = 0;
 
-		JsonObject disDur = obj.getAsJsonArray("rows").get(0).getAsJsonObject().getAsJsonArray("elements").get(0)
-				.getAsJsonObject();
+		JsonObject disDur = obj.getAsJsonArray("rows").get(0).getAsJsonObject()
+				.getAsJsonArray("elements").get(0).getAsJsonObject();
 
 		if (disDur.get("status").toString().equals("\"OK\"")) {
-			distance = disDur.getAsJsonObject("distance").get("value").getAsLong();
-			duration = disDur.getAsJsonObject("duration").get("value").getAsLong();
+			distance = disDur.getAsJsonObject("distance").get("value")
+					.getAsLong();
+			duration = disDur.getAsJsonObject("duration").get("value")
+					.getAsLong();
 		} else {
 			status = disDur.get("status").toString();
-			System.err.println("Unable to find route for " + origin + " status is " + disDur.get("status").toString());
+			System.err.println("Unable to find route for " + origin
+					+ " status is " + disDur.get("status").toString());
 			System.err.println(obj);
 		}
 
@@ -101,7 +112,8 @@ public class Ajax {
 
 	}
 
-	public static String encodeURLParameter(String t) throws UnsupportedEncodingException {
+	public static String encodeURLParameter(String t)
+			throws UnsupportedEncodingException {
 		// Javascript doesn't decode + symbols.
 		return URLEncoder.encode(t, "UTF-8").replace("+", "%20");
 	}
