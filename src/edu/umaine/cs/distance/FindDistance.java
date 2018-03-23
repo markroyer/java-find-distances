@@ -51,7 +51,7 @@ public class FindDistance {
 			System.err.println();
 			System.err.println("For example,");
 			System.err.println();
-			System.err.println("java edu.umaine.cs.FindDistance exampleInput.csv \"Orono, ME\"");
+			System.err.println("java edu.umaine.cs.FindDistance exampleInput.csv \"Orono, ME\" YOUR_API_KEY");
 			System.exit(-1);
 		}
 
@@ -100,7 +100,7 @@ public class FindDistance {
 					Thread.sleep(80); // Slow and steady...
 				}
 				writeRow(out, row, r);
-				writeRow(System.out, row, r);
+//				writeRow(System.out, row, r);
 
 			}
 
