@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 /**
@@ -33,8 +34,8 @@ public class FindDistance {
 	static Map<String, Route> cachedInfo;
 
 	/**
-	 * Usage: java edu.umaine.cs.distance.FindDistance input_file.csv 'City,
-	 * State Abbreviation'
+	 * Usage: java edu.umaine.cs.distance.FindDistance input_file.csv 'City, State
+	 * Abbreviation'
 	 * 
 	 * For example,
 	 * 
@@ -47,7 +48,8 @@ public class FindDistance {
 	public static void main(String[] args) throws Exception {
 
 		if (args.length < 3) {
-			System.err.println("Usage: java edu.umaine.cs.FindDistance input_file.csv 'City, State Abbreviation' YOUR_API_KEY");
+			System.err.println(
+					"Usage: java edu.umaine.cs.FindDistance input_file.csv 'City, State Abbreviation' YOUR_API_KEY");
 			System.err.println();
 			System.err.println("For example,");
 			System.err.println();
@@ -58,10 +60,12 @@ public class FindDistance {
 		final String INPUT_FILE_NAME = args[0];
 		final String CITY_STATE = args[1];
 		final String API_KEY = args[2];
+		final String CACHE_FILE_NAME = String.format("%s-%s-cachedLocations.json", extractCity(CITY_STATE),
+				extractState(CITY_STATE));
 		File outputFile = new File(INPUT_FILE_NAME.replace(".csv", "Out.csv"));
-		File cachedFile = new File("cachedLocations.json");
+		File cachedFile = new File(CACHE_FILE_NAME);
 
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		if (cachedFile.exists()) {
 
@@ -120,6 +124,46 @@ public class FindDistance {
 
 		System.out.printf("Finished finding distances for %d locations.  Output is in the file at '%s'.\n",
 				staff.size(), outputFile.getAbsolutePath());
+	}
+
+	private static String extractState(String cityState) {
+
+		String[] parts = cityState.split(",");
+
+		if (parts.length != 2) {
+			throw new RuntimeException(
+					"Expected a single comma in the city state specificaion. For example, \"Orono, ME\"");
+		}
+		
+		String result = parts[1].trim().toLowerCase();
+		
+		if (result.matches(".*\\s+.*")) {
+			throw new RuntimeException("State should not contain spaces.  Should be two letter code like ME.");
+		}
+		if (result.length() != 2) {
+			throw new RuntimeException(
+					"Expected a two letter state code like ME. ");
+		}
+
+		return result;
+	}
+
+	/**
+	 * @param cityState Comma separated city state. For example, "Orono, ME"
+	 * @return The city portion of the string in lower case. If the string contains
+	 *         whitespace, that white space is replaced with underscore characters.
+	 *         For example, "Old Town, ME" becomes "old_town".
+	 */
+	private static String extractCity(String cityState) {
+
+		String[] parts = cityState.split(",");
+
+		if (parts.length != 2) {
+			throw new RuntimeException(
+					"Expected a single comma in the city state specificaion. For example, \"Orono, ME\"");
+		}
+
+		return parts[0].trim().replaceAll("\\s", "_").toLowerCase();
 	}
 
 	private static void writeHeader(PrintStream out) {
