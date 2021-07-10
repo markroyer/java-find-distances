@@ -17,6 +17,18 @@
 			<version>2.8.7</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<mainClass>edu.umaine.cs.distance.FindDistance</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<!-- <build> <sourceDirectory>src</sourceDirectory> <plugins> <plugin> <artifactId>maven-compiler-plugin</artifactId> 
 		<version>3.8.1</version> <configuration> <release>11</release> </configuration> 
 		</plugin> </plugins> </build> -->
